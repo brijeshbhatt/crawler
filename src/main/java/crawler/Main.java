@@ -12,9 +12,12 @@ import org.jsoup.select.Elements;
 public class Main {
 	public static void main(String[] args) {
 
-		String url = getURLFromUser();
-		System.out.println("Insert url is :" + url);
-		parseDocument(url);
+//		String url = getURLFromUser();
+//		System.out.println("Insert url is :" + url);
+		String url = "http://mail-archives.apache.org/mod_mbox/maven-users/";
+		String year = "2014";
+		HTMLParser parser = new HTMLParser(url,year);
+		parser.parseMainDocument();
 	}
 
 	static String getURLFromUser() {
@@ -23,30 +26,5 @@ public class Main {
 		String url = in.nextLine();
 		return url;
 	}
-	
-	static  void parseDocument(String url){
-		try {
-			Document doc = Jsoup.connect(url).get();
-			
-			System.out.println(doc);
-//			System.out.println(doc.body());
-//			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@22222222");
-//			Elements elements = doc.getElementsByClass("year");
-//			Iterator<Element> it = elements.iterator();
-//			while(it.hasNext()){
-//				Element element = it.next();
-//				//System.out.println(element.toString());
-//				if(element.toString().contains("Year 2014")){
-//					System.out.println(element);
-//					System.out.println("*************************");
-//				}
-//				
-//			}
-			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+
 }
