@@ -1,35 +1,52 @@
 package crawler;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Scanner;
+import java.io.InputStream;
+import java.util.Properties;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.apache.log4j.Logger;
 
 public class Main {
+	static Logger log = Logger.getLogger(Main.class.getName());
+
 	public static void main(String[] args) {
-//		String secondPageUrl = "201412.mbox/thread";
-//		String url = secondPageUrl.replace("/thread", "");
-//		System.out.println(url);
+		log.info("Main class main method is started.");
 
-//		String url = getURLFromUser();
-//		System.out.println("Insert url is :" + url);
-		
-		
-		String url = "http://mail-archives.apache.org/mod_mbox/maven-users/";
-		String year = "2014";
-		HTMLParser parser = new HTMLParser(url,year);
-		parser.parseMainDocument();
-	}
+		String url = "";
+		String year = "";
 
-	static String getURLFromUser() {
-		System.out.println("Insert the url for crawling : ");
-		Scanner in = new Scanner(System.in);
-		String url = in.nextLine();
-		return url;
+		Properties prop = new Properties();
+		InputStream input = null;
+		try {
+			String filename = "config.properties";
+			input = Main.class.getClassLoader().getResourceAsStream(filename);
+			if (input == null) {
+				System.out.println("Sorry, unable to find " + filename);
+				return;
+			}
+			prop.load(input);
+			url = prop.getProperty("url");
+			year = prop.getProperty("year");
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		if (url.equals("") && year.equals("")) {
+			log.debug("No url and year are set in configuration file.");
+		} else {
+			HTMLParser parser = new HTMLParser(url, year);
+			parser.parseMainDocument();
+		}
+
+		log.info("Main class main method is ended.");
+
 	}
 
 }
