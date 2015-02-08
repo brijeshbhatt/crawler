@@ -2,9 +2,15 @@ package crawler;
 
 import static org.junit.Assert.*;
 
+import org.junit.Assert.*;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 /**
@@ -14,40 +20,56 @@ import org.junit.Test;
  *
  */
 public class CrawlerTest {
+
+	String mainURL = "";
+	String year = "";
+	String secondPageURL = "";
+	String mailURL = "";
+	String folderName = "";
+	String subject = "";
+	{
+		Properties prop = new Properties();
+		InputStream input = null;
+		try {
+			String filename = "testConfig.properties";
+			input = CrawlerTest.class.getClassLoader().getResourceAsStream(
+					filename);
+			prop.load(input);
+			mainURL = prop.getProperty("mainURL");
+			year = prop.getProperty("year");
+			secondPageURL = prop.getProperty("secondPageURL");
+			mailURL = prop.getProperty("mailURL");
+			folderName = prop.getProperty("folderName");
+			subject = prop.getProperty("subject");
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	
 	@Test
 	public void testDownloadMail() throws Exception {
-		new MailDownloaderImple()
-				.downloadMail(
-						"http://mail-archives.apache.org/mod_mbox/maven-users/201412.mbox/raw/%3C547C1A5F.7070709@uni-jena.de%3E",
-						"201412.mbox", "Maven Plugin Refelction");
-		System.out.println("success");
-
+		new MailDownloaderImple().downloadMail(mailURL, folderName, subject);
 	}
 
 	@Test
 	public void testParseFirstPage() throws Exception {
 		Map<String, String> map = new ApacheMailPageParserImple()
-				.parseFirstPage(
-						"http://mail-archives.apache.org/mod_mbox/maven-users/",
-						"2014");
+				.parseFirstPage(mainURL, year);
 		assertSame("Value should be same.", 12, map.keySet().size());
-		Iterator<String> iterator = map.keySet().iterator();
-		while (iterator.hasNext()) {
-			String folder = (String) iterator.next();
-			System.out.println(folder + " ~~~ " + map.get(folder));
-		}
-		System.out.println("success");
-
 	}
 
 	@Test
 	public void testDownloadMailFromSecondPage() throws Exception {
-		new ApacheMailPageParserImple()
-				.downloadMailFromSecondPage(
-						"http://mail-archives.apache.org/mod_mbox/maven-users/201412.mbox/thread",
-						"201412.mbox");
-		System.out.println("success");
-
+		new ApacheMailPageParserImple().downloadMailFromSecondPage(
+				secondPageURL, folderName);
 	}
 }
