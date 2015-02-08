@@ -2,33 +2,28 @@ package crawler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
 public class Main {
+
 	static Logger log = Logger.getLogger(Main.class.getName());
-
-	public static void main(String[] args) {
-		log.info("Main class main method is started.");
-
-		String url = "";
-		String year = "";
-
+	static String url = "";
+	static String year = "";
+	static {
 		Properties prop = new Properties();
 		InputStream input = null;
 		try {
 			String filename = "config.properties";
 			input = Main.class.getClassLoader().getResourceAsStream(filename);
-			if (input == null) {
-				System.out.println("Sorry, unable to find " + filename);
-				return;
-			}
 			prop.load(input);
 			url = prop.getProperty("url");
 			year = prop.getProperty("year");
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			log.error("Exception happen in static block ",ex);
 		} finally {
 			if (input != null) {
 				try {
@@ -38,14 +33,24 @@ public class Main {
 				}
 			}
 		}
+	}
+
+	public static void main(String[] args) {
+		log.info("main method is started.");
+
 		if (url.equals("") && year.equals("")) {
 			log.debug("No url and year are set in configuration file.");
 		} else {
-			HTMLParser parser = new HTMLParser(url, year);
-			parser.parseMainDocument();
+			ApacheMailPageParserImple parser = new ApacheMailPageParserImple();
+			Map<String, String> pro = parser.parseFirstPage(url, year);
+			Iterator<String> iterator = pro.keySet().iterator();
+			while (iterator.hasNext()) {
+				String folder = (String) iterator.next();
+				parser.createThreadForSecondPageParser(pro.get(folder), folder);
+			}
 		}
 
-		log.info("Main class main method is ended.");
+		log.info("main method is ended.");
 
 	}
 

@@ -1,16 +1,15 @@
 package crawler;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -18,25 +17,26 @@ import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class HTMLParser {
-	private String mainPageURL;
-	private String year;
-	private String home;
-	private String separator;
+/**
+ * @author brijeshb
+ *
+ */
+public class ApacheMailPageParserImple implements ApacheMailPageParser{
+	static Logger log = Logger.getLogger(ApacheMailPageParserImple.class.getName());
+	
 
-	public HTMLParser(String url, String year) {
-		super();
-		this.mainPageURL = url;
-		this.year = year;
-	}
-
-	{
-		java.util.Properties properties = System.getProperties();
-		home = properties.get("user.home").toString();
-		separator = properties.get("file.separator").toString();
-	}
-
-	void parseMainDocument() {
+	/**
+	 * Parse the first page and to find out the	relative URL of second page
+	 *  and return the Properties object which contain folder as key and URL of second page as value. 
+	 * 
+	 * @param pageURL
+	 *            URL of first page
+	 * @param year
+	 *            Year for mail downloading
+	 */
+	public Map<String, String>  parseFirstPage(String mainPageURL, String year) {
+		log.info("parseFirstPage is started.");
+		Map<String, String>  pro = new HashMap<String, String>();
 		try {
 			Document doc = Jsoup.connect(mainPageURL).get();
 			Elements elements = doc.getElementsByClass("year");
@@ -47,25 +47,38 @@ public class HTMLParser {
 					for(Element span : element.select("span.links")){
 						String href  = span.select("a").first().attr("href");
 						String folderName = href.replace("/thread","");
-						createThreadForSecondPageParser(mainPageURL + href,folderName);
+						//createThreadForSecondPageParser(mainPageURL + href,folderName);
+						pro.put(folderName, mainPageURL + href);
 					}
 					break;
 				}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException ex) {
+			log.error("Exception happen in parsing of FirstPage ",ex);
 		}
+		log.info("parseFirstPage is ended.");
+		return pro;
 	}
 	
-	private void createThreadForSecondPageParser(final String secondPageUrl,final  String folderName){
+	/**
+	 * @param secondPageUrl
+	 * @param folderName
+	 */
+	 void createThreadForSecondPageParser(final String secondPageUrl,final  String folderName){
 		new Thread(){
 			@Override
 			public void run() {
-				parseSecondPage(secondPageUrl,folderName);
+				downloadMailFromSecondPage(secondPageUrl,folderName);
 			}
 		}.start();
 	}
-	private void parseSecondPage(String secondPageUrl, String folderName) {
+	
+	/* (non-Javadoc)
+	 * @see crawler.ApacheMailPageParser#downloadMailFromSecondPage(java.lang.String, java.lang.String)
+	 */
+	public void downloadMailFromSecondPage(String secondPageUrl, String folderName) {
+		log.info("secondPageUrl is started.");
+		MailDownloaderImple mailDownLoader = new MailDownloaderImple();
 		boolean nextHit;
 		int i = 0, count = 0;
 		do {
@@ -103,7 +116,7 @@ public class HTMLParser {
 						Element element = it.next();
 						if (!element.getElementsByAttribute("href").isEmpty()) {
 							count++;
-							downloadMail(secondPageUrl.replace("thread", "raw")
+							mailDownLoader.downloadMail(secondPageUrl.replace("thread", "raw")
 							 + "/"+element.getElementsByAttribute("href").first().attr("href"), folderName , element.text());
 						}
 					}
@@ -113,30 +126,8 @@ public class HTMLParser {
 				e.printStackTrace();
 			}
 		} while (nextHit);
-		System.out.println("Total "+count + " mails has been downloaded in " + folderName +" .");
+		log.info("Total "+count + " mails has been downloaded in " + folderName +" .");
+		log.info("secondPageUrl is ended.");
 	}
-
-	private void downloadMail(String mailURL, String folderName, String subject) {
-		try {
-				String rawMail = Jsoup.connect(mailURL).execute().body();
-				System.out.println("Mail with subject "+subject+" has been downloaded");
-				File dir = new File(home + separator + "mail" + separator + folderName);
-				dir.mkdirs();
-				subject = subject.replace("/", ",");
-				File file = new File(dir, subject + ".txt");
-				if (file.exists()) {
-					file.delete();
-					file = new File(dir, subject + ".txt");
-				}
-				file.createNewFile();
-				FileWriter outFile = new FileWriter(file, true);
-				PrintWriter out = new PrintWriter(outFile);
-				out.append(rawMail);
-				out.close();
-				outFile.close();
-		}catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+	
 }
