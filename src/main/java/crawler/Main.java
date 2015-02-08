@@ -20,7 +20,7 @@ public class Main {
 			String filename = "config.properties";
 			input = Main.class.getClassLoader().getResourceAsStream(filename);
 			prop.load(input);
-			url = prop.getProperty("url");
+			url = prop.getProperty("mainURL");
 			year = prop.getProperty("year");
 		} catch (IOException ex) {
 			log.error("Exception happen in static block ",ex);

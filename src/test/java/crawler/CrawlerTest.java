@@ -1,16 +1,12 @@
 package crawler;
 
-import static org.junit.Assert.*;
-
-import org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 
 /**
