@@ -28,8 +28,7 @@ public final class AppUtil {
 		FILESEPERATOR = properties.get("file.separator").toString();
 		MAIL_FOLDER = "mail";
 	}
-	
-	
+
 	static {
 		Properties prop = new Properties();
 		InputStream input = null;
@@ -40,7 +39,7 @@ public final class AppUtil {
 			URL = prop.getProperty("mainURL");
 			YEAR = prop.getProperty("year");
 		} catch (IOException ex) {
-			log.error("Exception happen in static block ",ex);
+			log.error("Exception happen in static block ", ex);
 		} finally {
 			if (input != null) {
 				try {
@@ -53,7 +52,26 @@ public final class AppUtil {
 	}
 
 	public static boolean checkConnection(String url) {
+		boolean connectionAvailable = false;
+		while (!connectionAvailable) {
+			connectionAvailable = isConnectionAvailable(url);
+			if (connectionAvailable) {
+				break;
+			} else {
+				try {
+					Thread.currentThread().sleep(1000);
+					return checkConnection(url);
+				} catch (InterruptedException e1) {
+					log.error(e1.getMessage());
+				}
+			}
+		}
+		return connectionAvailable;
+	}
+
+	private static boolean isConnectionAvailable(String url) {
 		org.jsoup.Connection.Response response;
+		boolean connectionAvailable = false;
 		try {
 			response = Jsoup
 					.connect(url)
@@ -61,19 +79,12 @@ public final class AppUtil {
 							"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21")
 					.timeout(10000).ignoreHttpErrors(true).execute();
 			if (response.statusCode() == 200) {
-				return true;
+				connectionAvailable = true;
 			}
 		} catch (IOException e) {
 			log.error("Problem with internet, Not found the connection of \""
 					+ url + "\"");
-			try {
-				Thread.currentThread().sleep(1000);
-				return checkConnection(url);
-			} catch (InterruptedException e1) {
-				log.error(e1.getMessage());
-			}
-
 		}
-		return false;
+		return connectionAvailable;
 	}
 }
