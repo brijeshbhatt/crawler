@@ -1,5 +1,7 @@
 package crawler;
 
+import java.io.IOException;
+
 /**
 *
 * @author Brijesh Bhatt
@@ -12,5 +14,5 @@ public interface MailDownloader {
 	 * @param folderName
 	 * @param subject
 	 */
-	void downloadMail(String mailURL, String folderName, String subject);
+	void downloadMail(String mailURL, String folderName, String subject) throws IOException ;
 }

@@ -53,19 +53,18 @@ public class CrawlerTest {
 	
 	@Test
 	public void testDownloadMail() throws Exception {
-		new MailDownloaderImple().downloadMail(mailURL, folderName, subject);
+		new MailDownloaderImpl().downloadMail(mailURL, folderName, subject);
 	}
 
 	@Test
 	public void testParseFirstPage() throws Exception {
-		Map<String, String> map = new ApacheMailPageParserImple()
+		Map<String, String> map = new ApacheMailPageParserImpl()
 				.parseFirstPage(mainURL, year);
 		assertSame("Value should be same.", 12, map.keySet().size());
 	}
 
 	@Test
 	public void testDownloadMailFromSecondPage() throws Exception {
-		new ApacheMailPageParserImple().downloadMailFromSecondPage(
-				secondPageURL, folderName);
+		new ApacheMailPageParserImpl().parseSecondPage(secondPageURL);
 	}
 }

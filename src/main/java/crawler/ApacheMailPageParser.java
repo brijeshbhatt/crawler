@@ -1,7 +1,6 @@
 package crawler;
 
 import java.util.Map;
-import java.util.Properties;
 
 /**
  *
@@ -19,12 +18,15 @@ public interface ApacheMailPageParser {
 	 *            URL of first page
 	 * @param year
 	 *            Year for mail downloading
+	 * @return
+	 * 			A map  which key is folder where mail will be download for particular month
+	 * 			and value is second page URL of second page for every month of passed year.
 	 */
 	Map<String, String> parseFirstPage(String pageURL, String year);
 
 	/**
-	 * This method is responsible for parsing the second page and to download
-	 * the all mail for a particular month .
+	 * This method is responsible for parsing the second page and return list
+	 * which contain http URL of all mail for a particular month .
 	 * 
 	 * @param pageURL
 	 *            URL of second page for any Months
@@ -32,5 +34,5 @@ public interface ApacheMailPageParser {
 	 *            folder name where mail will be downloaded
 	 * 
 	 */
-	void downloadMailFromSecondPage(String pageURL, String folderName);
+	Map<String, String> parseSecondPage(String pageURL);
 }

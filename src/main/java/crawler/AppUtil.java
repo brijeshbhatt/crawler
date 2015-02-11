@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 /**
@@ -13,15 +14,15 @@ import org.jsoup.Jsoup;
  * @since 1.0
  *
  */
-public final class AppUtil {
+public class AppUtil {
 
-	static Logger log = Logger.getLogger(AppUtil.class.getName());
+	static Logger log = Logger.getLogger(AppUtil.class);
 	public static final String HOME;
 	public static final String FILESEPERATOR;
 	public static final String MAIL_FOLDER;
 	static String URL = "";
 	static String YEAR = "";
-
+	int NO_OF_CHECK_CONN = 50;
 	static {
 		java.util.Properties properties = System.getProperties();
 		HOME = properties.get("user.home").toString();
@@ -45,46 +46,33 @@ public final class AppUtil {
 				try {
 					input.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.error(
+							"Problem in closing stream of propert config file",
+							e);
 				}
 			}
 		}
 	}
 
-	public static boolean checkConnection(String url) {
-		boolean connectionAvailable = false;
-		while (!connectionAvailable) {
-			connectionAvailable = isConnectionAvailable(url);
-			if (connectionAvailable) {
-				break;
-			} else {
-				try {
-					Thread.currentThread().sleep(1000);
-					return checkConnection(url);
-				} catch (InterruptedException e1) {
-					log.error(e1.getMessage());
-				}
-			}
-		}
-		return connectionAvailable;
-	}
-
-	private static boolean isConnectionAvailable(String url) {
-		org.jsoup.Connection.Response response;
-		boolean connectionAvailable = false;
+	public Connection getConnection(String url) {
+		Connection conn = null;
 		try {
-			response = Jsoup
+			conn = Jsoup
 					.connect(url)
 					.userAgent(
 							"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21")
-					.timeout(10000).ignoreHttpErrors(true).execute();
-			if (response.statusCode() == 200) {
-				connectionAvailable = true;
+					.timeout(10000).ignoreHttpErrors(true);
+			org.jsoup.Connection.Response response = conn
+					.ignoreHttpErrors(true).execute();
+			if (response.statusCode() != 200) {
+				conn = null;
 			}
 		} catch (IOException e) {
 			log.error("Problem with internet, Not found the connection of \""
-					+ url + "\"");
+					+ url + "\"", e);
+			conn = null;
 		}
-		return connectionAvailable;
+		return conn;
 	}
+
 }
