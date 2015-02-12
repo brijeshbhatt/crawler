@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
+
+	<bean id="connectionFactory" class="crawler.ConnectionFactory" lazy-init="true"
+		scope="prototype">
+		<property name="noOfConnectionCheck" value="50" />
+	</bean>
+	<bean id="mailDownloader" class="crawler.MailDownloaderImpl" lazy-init="true"
+		scope="prototype">
+		<property name="mailFolder" value="mail" />
+		<property name="connectionFactory" ref="connectionFactory" />
+	</bean>
+	<bean id="linkExtractor" class="crawler.ApacheMailPageLinkExtractorImpl" lazy-init="true"
+		scope="prototype">
+		<property name="connectionFactory" ref="connectionFactory" />
+	</bean>
+	<bean id="main" class="crawler.Main" scope="prototype" lazy-init="true">
+		<property name="linkExtractor" ref="linkExtractor" />
+		<property name="mailDownloader" ref="mailDownloader" />
+		<property name="connectionFactory" ref="connectionFactory" />
+	</bean>
+</beans>
