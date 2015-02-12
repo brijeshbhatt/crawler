@@ -58,13 +58,13 @@ public class CrawlerTest {
 
 	@Test
 	public void testParseFirstPage() throws Exception {
-		Map<String, String> map = new ApacheMailPageParserImpl()
+		Map<String, String> map = new ApacheMailPageLinkExtractorImpl()
 				.parseFirstPage(mainURL, year);
 		assertSame("Value should be same.", 12, map.keySet().size());
 	}
 
 	@Test
 	public void testDownloadMailFromSecondPage() throws Exception {
-		new ApacheMailPageParserImpl().parseSecondPage(secondPageURL);
+		new ApacheMailPageLinkExtractorImpl().parseSecondPage(secondPageURL);
 	}
 }

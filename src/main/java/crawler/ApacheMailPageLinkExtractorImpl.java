@@ -15,10 +15,19 @@ import org.jsoup.select.Elements;
  * @author brijeshb
  *
  */
-public class ApacheMailPageParserImpl implements ApacheMailPageParser {
-	static Logger log = Logger.getLogger(ApacheMailPageParserImpl.class);
+public class ApacheMailPageLinkExtractorImpl implements ApacheMailPageLinkExtractor {
+	
+	static Logger log = Logger.getLogger(ApacheMailPageLinkExtractorImpl.class);
 
-	AppUtil appUtil = new AppUtil();
+	ConnectionFactory connectionFactory;
+
+	public ConnectionFactory getConnectionFactory() {
+		return connectionFactory;
+	}
+
+	public void setConnectionFactory(ConnectionFactory connectionFactory) {
+		this.connectionFactory = connectionFactory;
+	}
 
 	/**
 	 * Parse the first page and to find out the relative URL of second page and
@@ -35,8 +44,8 @@ public class ApacheMailPageParserImpl implements ApacheMailPageParser {
 		Map<String, String> dirVsURLMap = new HashMap<String, String>();
 		try {
 			Connection connection = null;
-			for (int i = 1; i <= appUtil.NO_OF_CHECK_CONN; i++) {
-				connection = appUtil.getConnection(mainPageURL);
+			for (int i = 1; i <= connectionFactory.getNoOfConnectionCheck(); i++) {
+				connection = connectionFactory.getConnection(mainPageURL);
 				if (connection != null) {
 					break;
 				} else {
@@ -84,8 +93,8 @@ public class ApacheMailPageParserImpl implements ApacheMailPageParser {
 			String url = secondPageUrl + "?" + i;
 			try {
 				Connection connection = null;
-				for (int j = 1; j <= appUtil.NO_OF_CHECK_CONN; j++) {
-					connection = appUtil.getConnection(url);
+				for (int j = 1; j <= getConnectionFactory().getNoOfConnectionCheck(); j++) {
+					connection = getConnectionFactory().getConnection(url);
 					if (connection != null) {
 						break;
 					} else {

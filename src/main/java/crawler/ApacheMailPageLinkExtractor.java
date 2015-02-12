@@ -8,7 +8,7 @@ import java.util.Map;
  * @since 1.0
  *
  */
-public interface ApacheMailPageParser {
+public interface ApacheMailPageLinkExtractor {
 
 	/**
 	 * This method is responsible for parsing the first page and to find out the
