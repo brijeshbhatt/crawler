@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
@@ -16,6 +15,8 @@ public class Main {
 	private ApacheMailPageLinkExtractorImpl linkExtractor;
 	private MailDownloader mailDownloader;
 	private ConnectionFactory connectionFactory;
+
+	//private static ApplicationContext context;
 
 	public ApacheMailPageLinkExtractorImpl getLinkExtractor() {
 		return linkExtractor;
@@ -47,24 +48,25 @@ public class Main {
 			String url = args[0];
 			String year = args[1];
 			if (checkArguments(url, year)) {
-				ApplicationContext context = new ClassPathXmlApplicationContext(
-						"beans.xml");
+				ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
 				Main main = (Main) context.getBean("main");
 				if (url.equals("") && year.equals("")) {
 					log.debug("No url and year are set in configuration file.");
 				} else {
 					Map<String, String> pro = main.linkExtractor
-							.parseFirstPage(url, year);
+							.linkExtractFromFirstPage(url, year);
 					Set<Entry<String, String>> entrySet = pro.entrySet();
 					for (Entry<String, String> entry : entrySet) {
 						main.createThreadForSecondPageParser(entry.getKey(),
 								entry.getValue());
 					}
 				}
+				context.close();
 			}
 		} else {
 			log.info("Pass URL and year as Application Arguments.");
 		}
+		
 		log.info("main method is ended.");
 	}
 
@@ -86,12 +88,12 @@ public class Main {
 		new Thread() {
 			@Override
 			public void run() {
-				Map<String, String> subjectVSURL = linkExtractor
-						.parseSecondPage(secondPageUrl);
+				Map<String, String> subjectVSURL = getLinkExtractor()
+						.linkExtractFromSecondPage(secondPageUrl);
 				int count = 0;
 				Set<Entry<String, String>> entrySet = subjectVSURL.entrySet();
 				for (Entry<String, String> entry : entrySet) {
-					for (int i = 1; i <= connectionFactory
+					for (int i = 1; i <= getConnectionFactory()
 							.getNoOfConnectionCheck(); i++) {
 						try {
 							mailDownloader.downloadMail(entry.getValue(),

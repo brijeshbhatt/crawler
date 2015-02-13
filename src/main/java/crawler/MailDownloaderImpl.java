@@ -10,7 +10,8 @@ import org.jsoup.Connection;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- *
+ * Responsible for downloading of mails.
+ * 
  * @author Brijesh Bhatt
  * @since 1.0
  *
@@ -57,15 +58,21 @@ public class MailDownloaderImpl implements MailDownloader, InitializingBean {
 		this.mailFolder = mailFolder;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * This method is responsible for downloading mail from passed mailURl and
+	 * write mail content into file with name passed subject and save that file
+	 * into passed folder of system.
 	 * 
-	 * @see crawler.MailDownloader#downloadMail(java.lang.String,
-	 * java.lang.String, java.lang.String)
+	 * @param mailURL
+	 *            Mail link where raw content of mail will be exist.
+	 * @param folderName
+	 *            directory full path where mail will be download.
+	 * @param subject
+	 *            file name of download mail.
 	 */
-	@Override
 	public void downloadMail(String mailURL, String folderName, String subject)
 			throws IOException {
+		log.info("downloadMail is started.");
 		Connection connection = connectionFactory.getConnection(mailURL);
 		if (connection != null) {
 			String rawMail = connection.execute().body();
@@ -86,9 +93,9 @@ public class MailDownloaderImpl implements MailDownloader, InitializingBean {
 		} else {
 			throw new IOException();
 		}
+		log.info("downloadMail is ended.");
 	}
 
-	@Override
 	public void afterPropertiesSet() throws Exception {
 		java.util.Properties properties = System.getProperties();
 		setHome(properties.get("user.home").toString());

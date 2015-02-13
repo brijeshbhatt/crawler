@@ -7,7 +7,8 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 /**
- *
+ * Responsible for creating a connection.
+ * 
  * @author Brijesh Bhatt
  * @since 1.0
  *
@@ -27,6 +28,7 @@ public class ConnectionFactory {
 	}
 
 	public Connection getConnection(String url) {
+		log.info("getConnection is started.");
 		Connection conn = null;
 		try {
 			conn = Jsoup
@@ -44,6 +46,7 @@ public class ConnectionFactory {
 					+ url + "\"", e);
 			conn = null;
 		}
+		log.info("getConnection is ended.");
 		return conn;
 	}
 

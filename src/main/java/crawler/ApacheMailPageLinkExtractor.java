@@ -18,11 +18,11 @@ public interface ApacheMailPageLinkExtractor {
 	 *            URL of first page
 	 * @param year
 	 *            Year for mail downloading
-	 * @return
-	 * 			A map  which key is folder where mail will be download for particular month
-	 * 			and value is second page URL of second page for every month of passed year.
+	 * @return A map which key is folder where mail will be download for
+	 *         particular month and value is second page URL of second page for
+	 *         every month of passed year.
 	 */
-	Map<String, String> parseFirstPage(String pageURL, String year);
+	Map<String, String> linkExtractFromFirstPage(String pageURL, String year);
 
 	/**
 	 * This method is responsible for parsing the second page and return list
@@ -31,8 +31,8 @@ public interface ApacheMailPageLinkExtractor {
 	 * @param pageURL
 	 *            URL of second page for any Months
 	 * @param folderName
-	 *            folder name where mail will be downloaded
-	 * 
+	 *            folder name where mail will be download
+	 * @return A map which key is file name of mail which will be download and
 	 */
-	Map<String, String> parseSecondPage(String pageURL);
+	Map<String, String> linkExtractFromSecondPage(String pageURL);
 }

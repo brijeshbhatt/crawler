@@ -30,17 +30,19 @@ public class ApacheMailPageLinkExtractorImpl implements ApacheMailPageLinkExtrac
 	}
 
 	/**
-	 * Parse the first page and to find out the relative URL of second page and
-	 * return the Properties object which contain folder as key and URL of
-	 * second page as value.
+	 * This method is responsible for parsing the first page and to find out the
+	 * relative URL of second page for every month of passed year.
 	 * 
 	 * @param pageURL
 	 *            URL of first page
 	 * @param year
 	 *            Year for mail downloading
+	 * @return A map which key is folder where mail will be download for
+	 *         particular month and value is second page URL of second page for
+	 *         every month of passed year.
 	 */
-	public Map<String, String> parseFirstPage(String mainPageURL, String year) {
-		log.info("parseFirstPage is started.");
+	public Map<String, String> linkExtractFromFirstPage(String mainPageURL, String year) {
+		log.info("linkExtractFromFirstPage is started.");
 		Map<String, String> dirVsURLMap = new HashMap<String, String>();
 		try {
 			Connection connection = null;
@@ -52,7 +54,7 @@ public class ApacheMailPageLinkExtractorImpl implements ApacheMailPageLinkExtrac
 					try {
 						Thread.sleep(2000);
 					} catch (InterruptedException e) {
-						log.error("Problem in thread sleep ", e);
+						log.error("Problem is in Thread sleep ", e);
 					}
 				}
 			}
@@ -78,13 +80,21 @@ public class ApacheMailPageLinkExtractorImpl implements ApacheMailPageLinkExtrac
 		} catch (IOException ex) {
 			log.error("Exception happen in parsing of FirstPage ", ex);
 		}
-		log.info("parseFirstPage is ended.");
+		log.info("linkExtractFromFirstPage is ended.");
 		return dirVsURLMap;
 	}
-
-	@Override
-	public Map<String, String> parseSecondPage(String secondPageUrl) {
-		log.info("secondPageUrl is started.");
+	/**
+	 * This method is responsible for parsing the second page and return list
+	 * which contain http URL of all mail for a particular month .
+	 * 
+	 * @param pageURL
+	 *            URL of second page for any Months
+	 * @param folderName
+	 *            folder name where mail will be download
+	 * @return A map which key is file name of mail which will be download and
+	 */
+	public Map<String, String> linkExtractFromSecondPage(String secondPageUrl) {
+		log.info("linkExtractFromSecondPage is started.");
 		Map<String, String> map = new HashMap<String, String>();
 		boolean nextHit;
 		int i = 0;
@@ -101,7 +111,7 @@ public class ApacheMailPageLinkExtractorImpl implements ApacheMailPageLinkExtrac
 						try {
 							Thread.sleep(2000);
 						} catch (InterruptedException e) {
-							log.error("Problem in thread sleep ", e);
+							log.error("Problem is in thread sleep ", e);
 						}
 					}
 				}
@@ -129,11 +139,11 @@ public class ApacheMailPageLinkExtractorImpl implements ApacheMailPageLinkExtrac
 					}
 				}
 			} catch (Exception e) {
-				log.info("Exception happen in downloadMailFromSecondPage ", e);
+				log.info("Exception happen in parsing of second page ", e);
 			}
 		} while (nextHit);
 
-		log.info("secondPageUrl is ended.");
+		log.info("linkExtractFromSecondPage is ended.");
 		return map;
 	}
 

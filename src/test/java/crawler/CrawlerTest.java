@@ -27,9 +27,8 @@ public class CrawlerTest {
 		Properties prop = new Properties();
 		InputStream input = null;
 		try {
-			String filename = "testConfig.properties";
-			input = CrawlerTest.class.getClassLoader().getResourceAsStream(
-					filename);
+			input = this.getClass().getClassLoader()
+					.getResourceAsStream("testConfig.properties");
 			prop.load(input);
 			mainURL = prop.getProperty("mainURL");
 			year = prop.getProperty("year");
@@ -50,21 +49,27 @@ public class CrawlerTest {
 		}
 	}
 
-	
+	@Test
+	public void testGetConnection() throws Exception {
+		System.out.println("testGetConnection");
+		new ConnectionFactory().getConnection(mailURL);
+	}
+
 	@Test
 	public void testDownloadMail() throws Exception {
 		new MailDownloaderImpl().downloadMail(mailURL, folderName, subject);
 	}
 
 	@Test
-	public void testParseFirstPage() throws Exception {
+	public void testLinkExtractorFromFirstPage() throws Exception {
 		Map<String, String> map = new ApacheMailPageLinkExtractorImpl()
-				.parseFirstPage(mainURL, year);
+				.linkExtractFromFirstPage(mainURL, year);
 		assertSame("Value should be same.", 12, map.keySet().size());
 	}
 
 	@Test
-	public void testDownloadMailFromSecondPage() throws Exception {
-		new ApacheMailPageLinkExtractorImpl().parseSecondPage(secondPageURL);
+	public void testLinkExtractorFromSecondPage() throws Exception {
+		new ApacheMailPageLinkExtractorImpl()
+				.linkExtractFromSecondPage(secondPageURL);
 	}
 }
